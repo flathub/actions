@@ -71,13 +71,16 @@ def main():
         github_event = json.load(f)
 
     if github_event['action'] != "created":
+        print("this is not a new comment event")
         sys.exit(0)
 
     if 'pull_request' not in github_event['issue']:
+        print("the issue is not a pull request")
         sys.exit(0)
 
     command = re.search("^/merge.*", github_event['comment']['body'], re.M)
     if not command:
+        print("comment doesn't contain '/merge' command")
         sys.exit(0)
 
     gh = github.Github(github_token)
