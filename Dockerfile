@@ -1,4 +1,4 @@
-FROM archlinux/base
+FROM alpine:edge
 
 LABEL version="1.0.0"
 LABEL repository="http://github.com/flathub-actions/merge-app"
@@ -9,6 +9,7 @@ LABEL "com.github.actions.description"="Imports new application from PR to Flath
 LABEL "com.github.actions.icon"="git-pull-request"
 LABEL "com.github.actions.color"="blue"
 
-RUN pacman -Syu --noconfirm flatpak-builder git python python-pygithub python-requests python-pygit2
+RUN apk add --no-cache flatpak-builder git python3 py3-requests py3-pygit2 py3-yaml && \
+    python3 -m pip install pygithub
 ADD entrypoint.py /entrypoint.py
-ENTRYPOINT ['/entrypoint.py']
+ENTRYPOINT ["/entrypoint.py"]
