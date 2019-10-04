@@ -63,24 +63,22 @@ def detect_appid(dirname):
 def main():
     github_token = os.environ.get('GITHUB_TOKEN')
     if not github_token:
+        print("GITHUB_TOKEN environment variable is not set")
         sys.exit(1)
 
     github_event_path = os.environ.get('GITHUB_EVENT_PATH')
     with open(github_event_path) as f:
         payload = json.load(f)
 
-    # TODO: print actual message
     if github_event['action'] != "created":
-        sys.exit(1)
+        sys.exit(0)
 
-    # TODO: print actual message
     if 'pull_request' not in github_event['issue']:
-        sys.exit(1)
+        sys.exit(0)
 
-    # TODO: print actual message
     command = re.search("^/merge.*", github_event['comment']['body'], re.M)
     if not command:
-        sys.exit(1)
+        sys.exit(0)
 
     gh = github.Github(github_token)
     org = gh.get_organization("flathub")
@@ -89,8 +87,8 @@ def main():
     reviewers = org.get_team_by_slug('reviewers')
     comment_author = gh.get_user(github_event['comment']['user']['login'])
 
-    # TODO: print actual message
     if not admins.has_in_members(comment_author) or not reviewers.has_in_members(comment_author):
+        print(f"{comment_author} is not a reviewer")
         sys.exit(1)
 
     flathub = org.get_repo("flathub")
