@@ -68,7 +68,7 @@ def main():
 
     github_event_path = os.environ.get('GITHUB_EVENT_PATH')
     with open(github_event_path) as f:
-        payload = json.load(f)
+        github_event = json.load(f)
 
     if github_event['action'] != "created":
         sys.exit(0)
