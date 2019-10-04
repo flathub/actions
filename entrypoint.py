@@ -118,6 +118,7 @@ def main():
     print("pushing changes to the new repo on flathub\n")
     git_push = f"cd {tmpdir.name} && git push flathub {branch}:{args.branch}"
     subprocess.run(git_push, shell=True, check=True)
+    repo.remove_to_collaborators('flathubbot')
 
     print("\nsetting protected branches")
     set_protected_branch(github_token, "flathub", appid, "master")
