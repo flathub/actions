@@ -78,10 +78,12 @@ def main():
         print("the issue is not a pull request")
         sys.exit(0)
 
-    command = re.search("^/merge.*", github_event['comment']['body'], re.M)
-    if not command:
+    command_re = re.search("^/merge.*", github_event['comment']['body'], re.M)
+    if not command_re:
         print("comment doesn't contain '/merge' command")
         sys.exit(0)
+    else:
+        command = command_re.group()
 
     gh = github.Github(github_token)
     org = gh.get_organization("flathub")
