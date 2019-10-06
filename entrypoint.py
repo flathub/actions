@@ -134,6 +134,7 @@ def main():
     collaborators = {user.replace('@', '') for user in command.split()[1:]}
     for user in collaborators:
         print(f"adding {user} to collaborators")
+        repo.add_to_collaborators(user, permission="push")
 
     print("closing the pull request")
     close_comment = (f"Repository has been created: {repo.html_url}", "\n", "Thanks!")
