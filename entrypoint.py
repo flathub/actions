@@ -105,8 +105,8 @@ def main():
     print(f"cloning {fork_url} (branch: {branch})")
     clone = pygit2.clone_repository(fork_url, tmpdir.name, checkout_branch=branch)
 
-    manifest_file, detected_appid = detect_appid(tmpdir.name)
-    print(f"detected {detected_appid} as appid from {manifest_file}")
+    manifest_file, appid = detect_appid(tmpdir.name)
+    print(f"detected {appid} as appid from {manifest_file}")
 
     if os.path.splitext(manifest_file)[0] != appid:
         print("manifest filename does not match appid")
