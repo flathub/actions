@@ -119,7 +119,7 @@ def main():
     clone.remotes.create("flathub", f"https://x-access-token:{github_token}@github.com/flathub/{appid}")
 
     print("pushing changes to the new repo on flathub\n")
-    git_push = f"cd {tmpdir.name} && git push flathub {branch}:{args.branch}"
+    git_push = f"cd {tmpdir.name} && git push flathub {branch}:master"
     subprocess.run(git_push, shell=True, check=True)
     repo.remove_to_collaborators('flathubbot')
 
