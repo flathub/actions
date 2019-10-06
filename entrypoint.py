@@ -126,7 +126,7 @@ def main():
     print("\nsetting protected branches")
     set_protected_branch(github_token, "flathub", appid, "master")
     set_protected_branch(github_token, "flathub", appid, "beta")
-    set_protected_branch(github_token, "flathub", appid, "branch/")
+    set_protected_branch(github_token, "flathub", appid, "branch/*")
 
     print(f"adding {pr_author} to collaborators")
     repo.add_to_collaborators(pr_author, permission="push")
