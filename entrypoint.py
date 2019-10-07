@@ -33,7 +33,6 @@ def set_protected_branch(token, owner, repo, branch):
     return r.status_code
 
 
-# TODO: rework to use flatpak-builder --show-manifest
 def detect_appid(dirname):
     files = []
     ret = None
@@ -41,21 +40,22 @@ def detect_appid(dirname):
     for ext in ("yml", "yaml", "json"):
         files.extend(glob.glob(f"{dirname}/*.{ext}"))
 
-    for file in files:
-        if os.path.isfile(file):
-            ext = file.split('.')[-1]
+    for filename in files:
+        if os.path.isfile(filename):
+            ext = filename.split('.')[-1]
 
-            with open(file) as f:
+            with open(filename) as f:
                 if ext in ("yml", "yaml"):
                     manifest = yaml.safe_load(f)
                 else:
-                    manifest = json.load(f)
+                    result = subprocess.run(['flatpak-builder', '--show-manifest', filename], stdout=subprocess.PIPE)
+                    manifest = result.stdout.decode('utf-8')
 
             if manifest:
                 if "app-id" in manifest:
-                    ret = (os.path.basename(file), manifest["app-id"])
+                    ret = (os.path.basename(filename), manifest["app-id"])
                 elif 'id' in manifest:
-                    ret = (os.path.basename(file), manifest["id"])
+                    ret = (os.path.basename(filename), manifest["id"])
 
     return ret
 
