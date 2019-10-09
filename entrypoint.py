@@ -92,7 +92,7 @@ def main():
     reviewers = org.get_team_by_slug('reviewers')
     comment_author = gh.get_user(github_event['comment']['user']['login'])
 
-    if not admins.has_in_members(comment_author) or not reviewers.has_in_members(comment_author):
+    if not admins.has_in_members(comment_author) and not reviewers.has_in_members(comment_author):
         print(f"{comment_author} is not a reviewer")
         sys.exit(1)
 
