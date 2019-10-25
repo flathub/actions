@@ -7,6 +7,9 @@ RUN apt-get update && \
         python3-tenacity && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN git config --global user.name "flathubbot" && \
+    git config --global user.email "sysadmin@flathub.org"
+
 RUN git clone https://github.com/endlessm/flatpak-external-data-checker /opt/flatpak-external-data-checker
 
 ADD entrypoint.sh /entrypoint.sh
