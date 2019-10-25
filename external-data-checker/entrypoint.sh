@@ -19,4 +19,4 @@ else
     exit 1
 fi
 
-/opt/flatpak-external-data-checker/flatpak-external-data-checker $manifest
+/opt/flatpak-external-data-checker/flatpak-external-data-checker --update $manifest
