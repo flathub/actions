@@ -119,9 +119,14 @@ def main():
 
     print("adding flathub remote")
     clone.remotes.create("flathub", f"https://x-access-token:{github_token}@github.com/flathub/{appid}")
-
+    
+    try: 
+        remote_branch = command.split()[0].split(":")[1]
+    except IndexError:
+        remote_branch = "master"
+    
     print("pushing changes to the new repo on flathub\n")
-    git_push = f"cd {tmpdir.name} && git push flathub {branch}:master"
+    git_push = f"cd {tmpdir.name} && git push flathub {branch}:{remote_branch}"
     subprocess.run(git_push, shell=True, check=True)
     repo.remove_from_collaborators('flathubbot')
 
