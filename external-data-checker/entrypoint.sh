@@ -11,7 +11,7 @@ APP_ID=${GITHUB_REPOSITORY#flathub/}
 if [[ -f ${APP_ID}.yml ]]; then
     manifest=${APP_ID}.yml
 elif [[ -f ${APP_ID}.yaml ]]; then
-    manifest=${APP_ID}.yml
+    manifest=${APP_ID}.yaml
 elif [[ -f ${APP_ID}.json ]]; then
     manifest=${APP_ID}.json
 else
