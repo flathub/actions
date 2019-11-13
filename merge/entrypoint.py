@@ -49,7 +49,10 @@ def detect_appid(dirname):
                     manifest = yaml.safe_load(f)
                 else:
                     result = subprocess.run(['flatpak-builder', '--show-manifest', filename], stdout=subprocess.PIPE)
-                    manifest = json.loads(result.stdout.decode('utf-8'))
+                    if result.returncode == 0:
+                        manifest = json.loads(result.stdout.decode('utf-8'))
+                    else:
+                        break
 
             if manifest:
                 if "app-id" in manifest:
