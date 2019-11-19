@@ -22,4 +22,4 @@ fi
 git config user.name "flathubbot" && \
 git config user.email "sysadmin@flathub.org"
 
-/opt/flatpak-external-data-checker/flatpak-external-data-checker --update $manifest
+/opt/flatpak-external-data-checker/flatpak-external-data-checker --verbose --update $manifest
