@@ -34,6 +34,6 @@ for repo in */; do
     manifest=$(detect_manifest $repo)
     if [[ -n $manifest ]]; then
         echo "==> checking ${repo}"
-        /opt/flatpak-external-data-checker/flatpak-external-data-checker $repo/$manifest
+        /opt/flatpak-external-data-checker/flatpak-external-data-checker --verbose $repo/$manifest
     fi
 done
