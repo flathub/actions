@@ -27,7 +27,7 @@ git config --global user.email "sysadmin@flathub.org"
 mkdir flathub
 cd flathub
 
-gh-ls-org flathub | parallel "git clone --depth 1 {}"
+gh-ls-org flathub | parallel "git clone --depth 1 --recursive {}"
 
 for repo in */; do
     repo=${repo%/}
