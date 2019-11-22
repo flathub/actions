@@ -28,9 +28,9 @@ mkdir flathub
 cd flathub
 
 gh-ls-org flathub | parallel "git clone --depth 1 --recursive {}"
+mapfile -t checker_apps < <( grep -rl x-checker-data | cut -d/ -f1 | sort -u )
 
-for repo in */; do
-    repo=${repo%/}
+for repo in ${checker_apps[@]}; do
     manifest=$(detect_manifest $repo)
     if [[ -n $manifest ]]; then
         echo "==> checking ${repo}"
