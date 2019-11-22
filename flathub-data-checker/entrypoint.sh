@@ -27,7 +27,7 @@ git config --global user.email "sysadmin@flathub.org"
 mkdir flathub
 cd flathub
 
-gh-ls-org flathub | parallel "git clone --depth 1 --recursive {}"
+gh-ls-org flathub | parallel "git clone --depth 1 {}"
 mapfile -t checker_apps < <( grep -rl x-checker-data | cut -d/ -f1 | sort -u )
 
 for repo in ${checker_apps[@]}; do
