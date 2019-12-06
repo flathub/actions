@@ -147,9 +147,18 @@ def main():
         print(f"adding {user} to collaborators")
         repo.add_to_collaborators(user, permission="push")
 
+    close_comment = (
+        f"Repository has been created: {repo.html_url}", "\n",
+        "You should receive an invitation to collaborators, which will grant ",
+        "you write access to the repository above. The invitecan be also viewed ",
+        "[here](f{repo.html_url}/invitations).", "\n",
+        "If you never maintained an application before, common questions are answered in",
+        "[the app maintenance guide](https://github.com/flathub/flathub/wiki/App-Maintenance)."
+        "\n", "Thanks!",
+    )
+
     print("closing the pull request")
-    close_comment = (f"Repository has been created: {repo.html_url}", "\n", "Thanks!")
-    pr.create_issue_comment("\n".join(close_comment))
+    pr.create_issue_comment(close_comment)
     pr.edit(state="closed")
 
 
