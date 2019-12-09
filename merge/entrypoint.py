@@ -148,7 +148,7 @@ def main():
         repo.add_to_collaborators(user, permission="push")
 
     close_comment = (
-        f"Repository has been created: {repo.html_url}", "\n",
+        f"A repository for this has been created: {repo.html_url}", "\n",
         "You will receive an invitation to be a collaborator which will grant ",
         "you write access to the repository above. The invite can be also viewed ",
         "[here](f{repo.html_url}/invitations).", "\n",
