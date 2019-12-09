@@ -149,7 +149,7 @@ def main():
 
     close_comment = (
         f"Repository has been created: {repo.html_url}", "\n",
-        "You should receive an invitation to collaborators, which will grant ",
+        "You will receive an invitation to be a collaborator which will grant ",
         "you write access to the repository above. The invitecan be also viewed ",
         "[here](f{repo.html_url}/invitations).", "\n",
         "If you have never maintained an application before common questions are answered in",
