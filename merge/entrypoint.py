@@ -152,7 +152,7 @@ def main():
         "You should receive an invitation to collaborators, which will grant ",
         "you write access to the repository above. The invitecan be also viewed ",
         "[here](f{repo.html_url}/invitations).", "\n",
-        "If you never maintained an application before, common questions are answered in",
+        "If you have never maintained an application before common questions are answered in",
         "[the app maintenance guide](https://github.com/flathub/flathub/wiki/App-Maintenance)."
         "\n", "Thanks!",
     )
