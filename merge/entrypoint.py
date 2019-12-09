@@ -150,7 +150,7 @@ def main():
     close_comment = (
         f"Repository has been created: {repo.html_url}", "\n",
         "You will receive an invitation to be a collaborator which will grant ",
-        "you write access to the repository above. The invitecan be also viewed ",
+        "you write access to the repository above. The invite can be also viewed ",
         "[here](f{repo.html_url}/invitations).", "\n",
         "If you have never maintained an application before common questions are answered in",
         "[the app maintenance guide](https://github.com/flathub/flathub/wiki/App-Maintenance)."
