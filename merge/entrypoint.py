@@ -126,6 +126,8 @@ def main():
     
     try: 
         remote_branch = command.split()[0].split(":")[1]
+        if remote_branch != 'beta':
+            remote_branch = f"branch/{remote_branch}"
     except IndexError:
         remote_branch = "master"
     
