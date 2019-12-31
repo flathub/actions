@@ -120,6 +120,7 @@ def main():
 
     print("creating new repo on flathub")
     repo = org.create_repo(appid)
+    repo.edit(description=f"https://flathub.org/apps/details/{appid}")
 
     print("adding flathub remote")
     clone.remotes.create("flathub", f"https://x-access-token:{github_token}@github.com/flathub/{appid}")
