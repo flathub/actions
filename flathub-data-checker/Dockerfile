@@ -15,7 +15,7 @@ RUN apt-get update && \
         python3-tenacity && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN git clone https://github.com/flathub/flatpak-external-data-checker /opt/flatpak-external-data-checker
+RUN git clone -b wip/automerge https://github.com/flathub/flatpak-external-data-checker /opt/flatpak-external-data-checker
 
 ADD gh-ls-org /usr/local/bin/gh-ls-org
 ADD entrypoint.sh /entrypoint.sh
