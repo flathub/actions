@@ -8,6 +8,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import logging
 
 import github
 import pygit2
@@ -35,12 +36,13 @@ def set_protected_branch(token, owner, repo, branch):
 
 def detect_appid(dirname):
     files = []
-    ret = None
+    ret = (None, None)
 
     for ext in ("yml", "yaml", "json"):
         files.extend(glob.glob(f"{dirname}/*.{ext}"))
 
     for filename in files:
+        logging.info(f"Parsing {filename}")
         if os.path.isfile(filename):
             ext = filename.split('.')[-1]
 
@@ -52,7 +54,13 @@ def detect_appid(dirname):
                     if result.returncode == 0:
                         manifest = json.loads(result.stdout.decode('utf-8'))
                     else:
-                        break
+                        logging.info("flatpak-builder failed to print manifest, falling back to json Python module")
+                        try:
+                            with open(filename) as f:
+                                manifest = json.load(f)
+                        except json.decoder.JSONDecodeError:
+                            logging.error("Manifest is not a valid JSON")
+                            break
 
             if manifest:
                 if "app-id" in manifest:
@@ -66,7 +74,7 @@ def detect_appid(dirname):
 def main():
     github_token = os.environ.get('GITHUB_TOKEN')
     if not github_token:
-        print("GITHUB_TOKEN environment variable is not set")
+        logging.error("GITHUB_TOKEN environment variable is not set")
         sys.exit(1)
 
     github_event_path = os.environ.get('GITHUB_EVENT_PATH')
@@ -74,16 +82,16 @@ def main():
         github_event = json.load(f)
 
     if github_event['action'] != "created":
-        print("this is not a new comment event")
+        logging.error("The event is not a comment")
         sys.exit(0)
 
     if 'pull_request' not in github_event['issue']:
-        print("the issue is not a pull request")
+        logging.error("The issue is not a pull request")
         sys.exit(0)
 
     command_re = re.search("^/merge.*", github_event['comment']['body'], re.M)
     if not command_re:
-        print("comment doesn't contain '/merge' command")
+        logging.error("The comment doesn't contain '/merge' command")
         sys.exit(0)
     else:
         command = command_re.group()
@@ -96,7 +104,7 @@ def main():
     comment_author = gh.get_user(github_event['comment']['user']['login'])
 
     if not admins.has_in_members(comment_author) and not reviewers.has_in_members(comment_author):
-        print(f"{comment_author} is not a reviewer")
+        logging.error(f"{comment_author} is not a reviewer")
         sys.exit(1)
 
     flathub = org.get_repo("flathub")
@@ -107,22 +115,26 @@ def main():
     fork_url = pr.head.repo.clone_url
 
     tmpdir = tempfile.TemporaryDirectory()
-    print(f"cloning {fork_url} (branch: {branch})")
+    logging.info(f"Cloning {fork_url} (branch: {branch})")
     clone = pygit2.clone_repository(fork_url, tmpdir.name, checkout_branch=branch)
     clone.update_submodules(init=True)
 
     manifest_file, appid = detect_appid(tmpdir.name)
-    print(f"detected {appid} as appid from {manifest_file}")
-
-    if os.path.splitext(manifest_file)[0] != appid:
-        print("manifest filename does not match appid")
+    if manifest_file is None or appid is None:
+        logging.error("Failed to detect appid")
         os.exit(1)
 
-    print("creating new repo on flathub")
+    logging.info(f"Detected {appid} as appid from {manifest_file}")
+
+    if os.path.splitext(manifest_file)[0] != appid:
+        logging.error("Manifest filename does not match appid")
+        os.exit(1)
+
+    logging.info("Creating new repo on Flathub")
     repo = org.create_repo(appid)
     repo.edit(homepage=f"https://flathub.org/apps/details/{appid}")
 
-    print("adding flathub remote")
+    logging.info("Adding flathub remote")
     clone.remotes.create("flathub", f"https://x-access-token:{github_token}@github.com/flathub/{appid}")
     
     try: 
@@ -132,17 +144,17 @@ def main():
     except IndexError:
         remote_branch = "master"
     
-    print("pushing changes to the new repo on flathub\n")
+    logging.info("Pushing changes to the new Flathub repo")
     git_push = f"cd {tmpdir.name} && git push flathub {branch}:{remote_branch}"
     subprocess.run(git_push, shell=True, check=True)
     repo.remove_from_collaborators('flathubbot')
 
-    print("\nsetting protected branches")
+    logging.info("Setting protected branches")
     set_protected_branch(github_token, "flathub", appid, "master")
     set_protected_branch(github_token, "flathub", appid, "beta")
     set_protected_branch(github_token, "flathub", appid, "branch/*")
 
-    print(f"adding {pr_author} to collaborators")
+    logging.info(f"Adding {pr_author} to collaborators")
     repo.add_to_collaborators(pr_author, permission="push")
 
     collaborators = {user.replace('@', '') for user in command.split()[1:]}
@@ -157,7 +169,7 @@ def main():
         "Thanks!"
     )
 
-    print("closing the pull request")
+    logging.info("Closing the pull request")
     pr.create_issue_comment("\n".join(close_comment))
     pr.edit(state="closed")
 
