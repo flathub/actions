@@ -121,13 +121,13 @@ def main():
     manifest_file, appid = detect_appid(tmpdir.name)
     if manifest_file is None or appid is None:
         print("Failed to detect appid")
-        os.exit(1)
+        sys.exit(1)
 
     print(f"Detected {appid} as appid from {manifest_file}")
 
     if os.path.splitext(manifest_file)[0] != appid:
         print("Manifest filename does not match appid")
-        os.exit(1)
+        sys.exit(1)
 
     print("Creating new repo on Flathub")
     repo = org.create_repo(appid)
