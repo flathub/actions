@@ -1,6 +1,6 @@
-FROM fedora:31
+FROM archlinux
 
-RUN dnf install -y flatpak-builder git python3-requests python3-pyyaml \
-        python3-pygit2 python3-pygithub
+RUN pacman -Syu --noconfirm flatpak-builder git python-requests python-yaml \
+        python-pygit2 python-pygithub
 ADD entrypoint.py /entrypoint.py
 ENTRYPOINT ["/entrypoint.py"]
