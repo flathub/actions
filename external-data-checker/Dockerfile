@@ -15,7 +15,7 @@ RUN apt-get update && \
         python3-tenacity python3-pygit2 python3-defusedxml && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN git clone https://github.com/flathub/flatpak-external-data-checker /opt/flatpak-external-data-checker -b wip/automerge
+RUN git clone https://github.com/flathub/flatpak-external-data-checker /opt/flatpak-external-data-checker
 
 ADD gh-ls-org /usr/local/bin/gh-ls-org
 ADD entrypoint.sh /entrypoint.sh
