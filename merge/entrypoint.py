@@ -62,10 +62,17 @@ def detect_appid(dirname):
                             break
 
             if manifest:
+                manifest_file = os.path.basename(filename)
                 if "app-id" in manifest:
-                    ret = (os.path.basename(filename), manifest["app-id"])
+                    appid = manifest["app-id"]
                 elif 'id' in manifest:
-                    ret = (os.path.basename(filename), manifest["id"])
+                    appid = manifest["id"]
+                else:
+                    continue
+                if os.path.splitext(manifest_file)[0] != appid:
+                    print(f"Skipping {manifest_file}, does not match appid {appid}")
+                    continue
+                ret = (manifest_file, appid)
 
     return ret
 
@@ -124,10 +131,6 @@ def main():
         sys.exit(1)
 
     print(f"Detected {appid} as appid from {manifest_file}")
-
-    if os.path.splitext(manifest_file)[0] != appid:
-        print("Manifest filename does not match appid")
-        sys.exit(1)
 
     print("Creating new repo on Flathub")
     repo = org.create_repo(appid)
