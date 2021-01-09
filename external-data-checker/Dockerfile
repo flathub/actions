@@ -14,6 +14,7 @@ RUN apt-get update && \
         parallel python3-apt python3-gi python3-github python3-ruamel.yaml \
         python3-tenacity python3-pygit2 python3-defusedxml python3-toml \
         python3-pyelftools squashfs-tools && \
+        jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN git clone https://github.com/flathub/flatpak-external-data-checker /opt/flatpak-external-data-checker
