@@ -20,4 +20,5 @@ if __name__ == "__main__":
     org = g.get_organization(args.organization)
 
     for repo in org.get_repos():
-        print(repo.html_url)
+        if not repo.archived:
+            print(repo.html_url)
