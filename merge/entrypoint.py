@@ -8,6 +8,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 
 import github
 import pygit2
@@ -134,6 +135,7 @@ def main():
 
     print("Creating new repo on Flathub")
     repo = org.create_repo(appid)
+    time.sleep(5)
     repo.edit(homepage=f"https://flathub.org/apps/details/{appid}")
 
     print("Adding flathub remote")
