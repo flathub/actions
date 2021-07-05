@@ -28,7 +28,7 @@ mkdir flathub
 cd flathub
 
 gh-ls-org flathub | parallel "git clone --depth 1 {}"
-mapfile -t checker_apps < <( grep -rl -E 'x-checker-data|\.AppImage' | cut -d/ -f1 | sort -u )
+mapfile -t checker_apps < <( grep -rl -E 'extra-data|x-checker-data|\.AppImage' | cut -d/ -f1 | sort -u )
 
 for repo in ${checker_apps[@]}; do
     manifest=$(detect_manifest $repo)
