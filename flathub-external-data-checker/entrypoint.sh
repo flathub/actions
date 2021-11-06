@@ -7,6 +7,11 @@ fi
 
 detect_manifest() {
     repo=${1}
+    
+    # ignore repos which opted out
+    if [[ -f $repo/.flathubbotignore ]]; then
+        return 1
+    fi
 
     if [[ -f $repo/${repo}.yml ]]; then
         manifest=${repo}.yml
