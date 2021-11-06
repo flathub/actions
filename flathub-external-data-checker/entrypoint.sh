@@ -10,8 +10,8 @@ detect_manifest() {
     
     # check if repo opted out
     if [[ -f $repo/flathub.json ]]; then
-        jq -e '."disable-external-data-checker"' < $repo/flathub.json
-        if [ $? -eq 0 ]; then
+        jq -e '."disable-external-data-checker" | not' < $repo/flathub.json
+        if [ $? -ne 0 ]; then
             return 1
         fi
     fi
