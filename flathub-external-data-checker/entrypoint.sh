@@ -8,9 +8,12 @@ fi
 detect_manifest() {
     repo=${1}
     
-    # ignore repos which opted out
-    if [[ -f $repo/.flathubbotignore ]]; then
-        return 1
+    # check if repo opted out
+    if [[ -f $repo/flathub.json ]]; then
+        jq -e '."disable-external-data-checker"' < $repo/flathub.json
+        if [ $? -ne 0 ]; then
+            return 1
+        fi
     fi
 
     if [[ -f $repo/${repo}.yml ]]; then
