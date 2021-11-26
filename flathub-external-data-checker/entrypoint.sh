@@ -7,6 +7,13 @@ fi
 
 detect_manifest() {
     repo=${1}
+    
+    # check if repo opted out
+    if [[ -f $repo/flathub.json ]]; then
+        if ! jq -e '."disable-external-data-checker" | not' < $repo/flathub.json; then
+            return 1
+        fi
+    fi
 
     if [[ -f $repo/${repo}.yml ]]; then
         manifest=${repo}.yml
