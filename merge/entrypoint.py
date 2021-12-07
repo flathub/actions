@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
 import glob
 import json
 import os
@@ -12,26 +11,63 @@ import time
 
 import github
 import pygit2
-import requests
 import yaml
+from gql import Client, gql
+from gql.transport.requests import RequestsHTTPTransport
 
 
-def set_protected_branch(token, owner, repo, branch):
-    url = f"https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection"
-    json = {
-        "required_status_checks": None,
-        "enforce_admins": None,
-        "required_pull_request_reviews": None,
-        "restrictions": None,
-    }
-    headers = {
-        "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json",
-    }
+def set_protected_branch(token, repo, branch):
+    transport = RequestsHTTPTransport(
+        url="https://api.github.com/graphql",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    client = Client(transport=transport, fetch_schema_from_transport=True)
 
-    r = requests.put(url, json=json, headers=headers)
+    gql_get_repo_id = gql(
+        """
+        query get_repo_id($repo: String!) {
+            repository(name: $repo, owner: "flathub") {
+                id
+            }
+        }
+        """
+    )
 
-    return r.status_code
+    gql_add_branch_protection = gql(
+        """
+        mutation add_branch_protection($repositoryID: ID!, $pattern: String!) {
+            createBranchProtectionRule(
+                input: {
+                    allowsDeletions: false
+                    allowsForcePushes: false
+                    dismissesStaleReviews: false
+                    isAdminEnforced: false
+                    pattern: $pattern
+                    repositoryId: $repositoryID
+                    requiresApprovingReviews: false
+                    requiredApprovingReviewCount: null
+                    requiresCodeOwnerReviews: false
+                    requiredStatusCheckContexts: null
+                    requiresStatusChecks: false
+                    restrictsReviewDismissals: false
+                }
+            ) {
+                branchProtectionRule {
+                    id
+                }
+            }
+        }
+        """
+    )
+
+    repo_id = client.execute(gql_get_repo_id, variable_values={"repo": repo})
+    repo_id = repo_id["repository"]["id"]
+
+    result = client.execute(
+        gql_add_branch_protection,
+        variable_values={"repositoryID": repo_id, "pattern": branch},
+    )
+    return result
 
 
 def detect_appid(dirname):
@@ -171,9 +207,8 @@ def main():
     repo.remove_from_collaborators("flathubbot")
 
     print("Setting protected branches")
-    set_protected_branch(github_token, "flathub", appid, "master")
-    set_protected_branch(github_token, "flathub", appid, "beta")
-    set_protected_branch(github_token, "flathub", appid, "branch/*")
+    for branch in ("master", "main", "stable", "branch/*", "beta", "beta/*"):
+        set_protected_branch(github_token, appid, branch)
 
     print(f"Adding {pr_author} to collaborators")
     repo.add_to_collaborators(pr_author, permission="push")
@@ -193,7 +228,7 @@ def main():
         repo.add_to_collaborators(user, permission="push")
 
     close_comment = (
-        f"A repository for this has been created: {repo.html_url}",
+        f"A repository for this submission has been created: {repo.html_url}",
         "\n",
         f"You will receive an invitation to be a collaborator which will grant you write access to the repository above. The invite can be also viewed [here]({repo.html_url}/invitations).",
         "\n",
