@@ -13,6 +13,9 @@ detect_manifest() {
         if ! jq -e '."disable-external-data-checker" | not' < $repo/flathub.json > /dev/null; then
             return 1
         fi
+        if ! jq -e '."end-of-life" or ."end-of-life-rebase" | not' < $repo/flathub.json > /dev/null; then
+            return 1
+        fi
     fi
 
     if [[ -f $repo/${repo}.yml ]]; then
