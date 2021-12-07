@@ -26,7 +26,7 @@ def set_protected_branch(token, owner, repo, branch):
     }
     headers = {
         "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.loki-preview+json",
+        "Accept": "application/vnd.github.v3+json",
     }
 
     r = requests.put(url, json=json, headers=headers)
@@ -44,17 +44,22 @@ def detect_appid(dirname):
     for filename in files:
         print(f"Parsing {filename}")
         if os.path.isfile(filename):
-            ext = filename.split('.')[-1]
+            ext = filename.split(".")[-1]
 
             with open(filename) as f:
                 if ext in ("yml", "yaml"):
                     manifest = yaml.safe_load(f)
                 else:
-                    result = subprocess.run(['flatpak-builder', '--show-manifest', filename], stdout=subprocess.PIPE)
+                    result = subprocess.run(
+                        ["flatpak-builder", "--show-manifest", filename],
+                        stdout=subprocess.PIPE,
+                    )
                     if result.returncode == 0:
-                        manifest = json.loads(result.stdout.decode('utf-8'))
+                        manifest = json.loads(result.stdout.decode("utf-8"))
                     else:
-                        print("flatpak-builder failed to print manifest, falling back to json Python module")
+                        print(
+                            "flatpak-builder failed to print manifest, falling back to json Python module"
+                        )
                         try:
                             with open(filename) as f:
                                 manifest = json.load(f)
@@ -66,7 +71,7 @@ def detect_appid(dirname):
                 manifest_file = os.path.basename(filename)
                 if "app-id" in manifest:
                     appid = manifest["app-id"]
-                elif 'id' in manifest:
+                elif "id" in manifest:
                     appid = manifest["id"]
                 else:
                     continue
@@ -79,24 +84,24 @@ def detect_appid(dirname):
 
 
 def main():
-    github_token = os.environ.get('GITHUB_TOKEN')
+    github_token = os.environ.get("GITHUB_TOKEN")
     if not github_token:
         print("GITHUB_TOKEN environment variable is not set")
         sys.exit(1)
 
-    github_event_path = os.environ.get('GITHUB_EVENT_PATH')
+    github_event_path = os.environ.get("GITHUB_EVENT_PATH")
     with open(github_event_path) as f:
         github_event = json.load(f)
 
-    if github_event['action'] != "created":
+    if github_event["action"] != "created":
         print("The event is not a comment")
         sys.exit(0)
 
-    if 'pull_request' not in github_event['issue']:
+    if "pull_request" not in github_event["issue"]:
         print("The issue is not a pull request")
         sys.exit(0)
 
-    command_re = re.search("^/merge.*", github_event['comment']['body'], re.M)
+    command_re = re.search("^/merge.*", github_event["comment"]["body"], re.M)
     if not command_re:
         print("The comment doesn't contain '/merge' command")
         sys.exit(0)
@@ -106,16 +111,18 @@ def main():
     gh = github.Github(github_token)
     org = gh.get_organization("flathub")
 
-    admins = org.get_team_by_slug('admins')
-    reviewers = org.get_team_by_slug('reviewers')
-    comment_author = gh.get_user(github_event['comment']['user']['login'])
+    admins = org.get_team_by_slug("admins")
+    reviewers = org.get_team_by_slug("reviewers")
+    comment_author = gh.get_user(github_event["comment"]["user"]["login"])
 
-    if not admins.has_in_members(comment_author) and not reviewers.has_in_members(comment_author):
+    if not admins.has_in_members(comment_author) and not reviewers.has_in_members(
+        comment_author
+    ):
         print(f"{comment_author} is not a reviewer")
         sys.exit(1)
 
     flathub = org.get_repo("flathub")
-    pr_id = int(github_event['issue']['number'])
+    pr_id = int(github_event["issue"]["number"])
     pr = flathub.get_pull(pr_id)
     pr_author = pr.user.login
     branch = pr.head.label.split(":")[1]
@@ -139,21 +146,29 @@ def main():
     repo.edit(homepage=f"https://flathub.org/apps/details/{appid}")
 
     print("Adding flathub remote")
-    clone.remotes.create("flathub", f"https://x-access-token:{github_token}@github.com/flathub/{appid}")
+    clone.remotes.create(
+        "flathub", f"https://x-access-token:{github_token}@github.com/flathub/{appid}"
+    )
 
     try:
         remote_branch = command.split()[0].split(":")[1]
-        if remote_branch != 'beta':
+        if remote_branch != "beta":
             remote_branch = f"branch/{remote_branch}"
     except IndexError:
         remote_branch = "master"
 
     print("Pushing changes to the new Flathub repo")
     git_push = f"cd {tmpdir.name} && git push flathub {branch}:{remote_branch}"
-    ret = subprocess.run(git_push, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    ret = subprocess.run(
+        git_push,
+        shell=True,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
     print(ret.stdout)
     print(ret.stderr)
-    repo.remove_from_collaborators('flathubbot')
+    repo.remove_from_collaborators("flathubbot")
 
     print("Setting protected branches")
     set_protected_branch(github_token, "flathub", appid, "master")
@@ -163,16 +178,19 @@ def main():
     print(f"Adding {pr_author} to collaborators")
     repo.add_to_collaborators(pr_author, permission="push")
 
-    collaborators = {user.replace('@', '') for user in command.split()[1:]}
+    collaborators = {user.replace("@", "") for user in command.split()[1:]}
     for user in collaborators:
         print(f"adding {user} to collaborators")
         repo.add_to_collaborators(user, permission="push")
 
     close_comment = (
-        f"A repository for this has been created: {repo.html_url}", "\n",
-        f"You will receive an invitation to be a collaborator which will grant you write access to the repository above. The invite can be also viewed [here]({repo.html_url}/invitations).", "\n",
-        "If you have never maintained an application before, common questions are answered in [the app maintenance guide](https://github.com/flathub/flathub/wiki/App-Maintenance).", "\n",
-        "Thanks!"
+        f"A repository for this has been created: {repo.html_url}",
+        "\n",
+        f"You will receive an invitation to be a collaborator which will grant you write access to the repository above. The invite can be also viewed [here]({repo.html_url}/invitations).",
+        "\n",
+        "If you have never maintained an application before, common questions are answered in [the app maintenance guide](https://github.com/flathub/flathub/wiki/App-Maintenance).",
+        "\n",
+        "Thanks!",
     )
 
     print("Closing the pull request")
