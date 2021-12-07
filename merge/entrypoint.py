@@ -180,13 +180,11 @@ def main():
 
     print("Add trusted maintainers to collaborators")
     trusted_maintainers = flathub.get_team_by_slug("trusted-maintainers")
-    trusted_maintainers.add_to_repos(repo)
     trusted_maintainers.update_team_repository(repo, "push")
 
     print("Add KDE maintainers to collaborators")
     if repo.name.startswith("org.kde."):
         kde_maintainers = flathub.get_team_by_slug("KDE")
-        kde_maintainers.add_to_repos(repo)
         kde_maintainers.update_team_repository(repo, "push")
 
     collaborators = {user.replace("@", "") for user in command.split()[1:]}
