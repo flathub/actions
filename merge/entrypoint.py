@@ -217,8 +217,8 @@ def main():
     trusted_maintainers = org.get_team_by_slug("trusted-maintainers")
     trusted_maintainers.update_team_repository(repo, "push")
 
-    print("Add KDE maintainers to collaborators")
     if repo.name.startswith("org.kde."):
+        print("Add KDE maintainers to collaborators")
         kde_maintainers = org.get_team_by_slug("KDE")
         kde_maintainers.update_team_repository(repo, "push")
 
