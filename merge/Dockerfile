@@ -1,7 +1,10 @@
-FROM fedora:33
+FROM fedora:35
 
-RUN dnf install -y flatpak-builder git python3-requests python3-pyyaml \
-        python3-pygit2 python3-pygithub && \
+RUN dnf install -y flatpak-builder git /usr/bin/pip && \
     dnf clean all
+
+ADD requirements.txt /requirements.txt
+RUN pip install --pre -r /requirements.txt
+
 ADD entrypoint.py /entrypoint.py
 ENTRYPOINT ["/entrypoint.py"]
