@@ -234,6 +234,8 @@ def main():
         "\n",
         "If you have never maintained an application before, common questions are answered in [the app maintenance guide](https://github.com/flathub/flathub/wiki/App-Maintenance).",
         "\n",
+        f"You can vist the Page of your App on Flathub [here](https://flathub.org/apps/details/{appid}). It takes a few hours after your App is published.",
+        "\n",
         "Thanks!",
     )
 
