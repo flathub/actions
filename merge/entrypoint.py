@@ -44,8 +44,8 @@ def set_protected_branch(token, repo, branch):
                     isAdminEnforced: false
                     pattern: $pattern
                     repositoryId: $repositoryID
-                    requiresApprovingReviews: false
-                    requiredApprovingReviewCount: null
+                    requiresApprovingReviews: true
+                    requiredApprovingReviewCount: 0
                     requiresCodeOwnerReviews: false
                     requiredStatusCheckContexts: null
                     requiresStatusChecks: true
