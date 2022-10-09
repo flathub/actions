@@ -51,6 +51,7 @@ def set_protected_branch(token, repo, branch):
                     requiresStatusChecks: true
                     requiresStrictStatusChecks: true
                     restrictsReviewDismissals: false
+                    requiredStatusCheckContexts: ["builds/x86_64"]
                 }
             ) {
                 branchProtectionRule {
