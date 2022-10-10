@@ -47,7 +47,6 @@ def set_protected_branch(token, repo, branch):
                     requiresApprovingReviews: true
                     requiredApprovingReviewCount: 0
                     requiresCodeOwnerReviews: false
-                    requiredStatusCheckContexts: null
                     requiresStatusChecks: true
                     requiresStrictStatusChecks: true
                     restrictsReviewDismissals: false
