@@ -21,7 +21,7 @@ def set_protected_branch(token, repo, branch):
         url="https://api.github.com/graphql",
         headers={"Authorization": f"Bearer {token}"},
     )
-    client = Client(transport=transport, fetch_schema_from_transport=false)
+    client = Client(transport=transport, fetch_schema_from_transport=False)
 
     gql_get_repo_id = gql(
         """
